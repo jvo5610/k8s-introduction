@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: linksapp-db
+  labels:
+    run: linksapp-db
+spec:
+  selector:
+    matchLabels:
+      run: linksapp-db
+  serviceName: "linksapp-db"
+  template:
+    metadata:
+      generateName: linksapp-db
+      labels:
+        run: linksapp-db
+    spec:
+      initContainers:
+      - name: "remove-lost-found"
+        image: "busybox:stable"
+        imagePullPolicy: "Always"
+        command:  ["rm", "-fr", "/var/lib/mysql/lost+found"]
+        volumeMounts:
+        - name: linksapp-db-data
+          mountPath: /var/lib/mysql
+      containers:
+        - name: main-db
+          image: mysql
+          imagePullPolicy: Always
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: linksapp-db-secrets
+                  key: DB_PASS
+          ports:
+            - name: linksapp-db
+              containerPort: 3306
+          volumeMounts:
+            - name: linksapp-db-data
+              mountPath: "/var/lib/mysql"
+            - name: linksapp-schema-volume
+              mountPath: /docker-entrypoint-initdb.d/
+      volumes:
+        - name: linksapp-secrets-volume
+          secret:
+            secretName: linksapp-db-secrets
+        - name: linksapp-schema-volume
+          configMap:
+            name: linksapp-schema
+  volumeClaimTemplates:
+   - metadata:
+       name: linksapp-db-data
+     spec:
+       accessModes: [ "ReadWriteOnce" ]
+       storageClassName: 
+       resources:
+         requests:
+           storage: 1Gi

@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  DB_PASS: YWRtaW4=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: linksapp-db-secrets

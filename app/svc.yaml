@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: linksapp
+  labels:
+    run: linksapp
+spec:
+  ports:
+  - port: 4000
+    name: linksapp
+  selector:
+    run: linksapp

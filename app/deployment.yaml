@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linksapp
+  labels:
+    run: linksapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: linksapp
+  template:
+    metadata:
+      generateName: linksapp
+      labels:
+        run: linksapp
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: linksapp
+          image: pepe5610/linksapp
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: linksapp-secrets
+                  key: DATABASE_HOST
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: linksapp-secrets
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: linksapp-secrets
+                  key: DATABASE_PASSWORD
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: linksapp-secrets
+                  key: DATABASE_NAME
+          ports:
+            - name: linksapp
+              containerPort: 4000

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: linksapp-db
+  labels:
+    run: linksapp-db
+spec:
+  ports:
+  - port: 3306
+    name: linksapp-db
+  selector:
+    run: linksapp-db

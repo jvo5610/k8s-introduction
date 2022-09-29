@@ -3,6 +3,8 @@ config();
 
 export const database = {
   connectionLimit: 10,
+  waitForConnections: true,
+  queueLimit: 0,
   host: process.env.DATABASE_HOST || "localhost",
   user: process.env.DATABASE_USER || "root",
   password: process.env.DATABASE_PASSWORD || "mypassword",

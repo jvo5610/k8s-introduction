@@ -5,27 +5,33 @@ metadata:
   labels:
     run: linksapp
 spec:
-  replicas: 1
+#Number of replicas
+  replicas: 2
+#Selector that Pod must match to be affected by replica controler
   selector:
     matchLabels:
       run: linksapp
+  #Template used to create new Pods parts of this deployment
   template:
     metadata:
+    #Suffiux used when naming new Pods created
       generateName: linksapp
+      #Pods labels
       labels:
         run: linksapp
     spec:
       restartPolicy: Always
       containers:
         - name: linksapp
-          image: pepe5610/linksapp
-          imagePullPolicy: Always
+          image: pepe5610/linksapp:v1.0.0
+          imagePullPolicy: Always #May be IfNotPresent to prevent unnecessary pulls from registry
+          #Environemnt variables passed to Pod
           env:
             - name: DATABASE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: linksapp-secrets
-                  key: DATABASE_HOST
+                  name: linksapp-secrets #Name of secret with values
+                  key: DATABASE_HOST #Key needed from the secret
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
@@ -41,6 +47,6 @@ spec:
                 secretKeyRef:
                   name: linksapp-secrets
                   key: DATABASE_NAME
-          ports:
-            - name: linksapp
-              containerPort: 4000
+          ports: #Ports exposed by container
+            - name: linksapp #Name assigned to port
+              containerPort: 4000 #Port number

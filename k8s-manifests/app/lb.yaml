@@ -4,6 +4,7 @@ metadata:
   name: linksapp-lb
 spec:
   type: LoadBalancer
+  #Selector to match target Pods
   selector:
     run: linksapp
   ports:

@@ -9,6 +9,7 @@ spec:
     matchLabels:
       run: linksapp-db
   serviceName: "linksapp-db"
+  replicas: 1
   template:
     metadata:
       generateName: linksapp-db
@@ -16,16 +17,17 @@ spec:
         run: linksapp-db
     spec:
       initContainers:
-      - name: "remove-lost-found"
-        image: "busybox:stable"
-        imagePullPolicy: "Always"
+      - name: remove-lost-found
+        image: busybox:stable
+        imagePullPolicy: Always
         command:  ["rm", "-fr", "/var/lib/mysql/lost+found"]
         volumeMounts:
+        #Mounts PV claimed
         - name: linksapp-db-data
           mountPath: /var/lib/mysql
       containers:
         - name: main-db
-          image: mysql
+          image: mysql:5.7
           imagePullPolicy: Always
           env:
             - name: MYSQL_ROOT_PASSWORD
@@ -37,23 +39,25 @@ spec:
             - name: linksapp-db
               containerPort: 3306
           volumeMounts:
+            #Mounts PV claimed
             - name: linksapp-db-data
               mountPath: "/var/lib/mysql"
+            #Mounts CM with DB schema
             - name: linksapp-schema-volume
               mountPath: /docker-entrypoint-initdb.d/
       volumes:
-        - name: linksapp-secrets-volume
-          secret:
-            secretName: linksapp-db-secrets
         - name: linksapp-schema-volume
           configMap:
             name: linksapp-schema
+  #Claim for a external volume to be attached to pods
   volumeClaimTemplates:
    - metadata:
        name: linksapp-db-data
      spec:
+       #Storage access mode
        accessModes: [ "ReadWriteOnce" ]
-       storageClassName: 
+       #StorageClass
+       storageClassName: do-block-storage
        resources:
          requests:
            storage: 1Gi
